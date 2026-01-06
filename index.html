@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        header {
+            background-color: #fff;
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .hamburger {
+            font-size: 20px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .logo img {
+            height: 24px;
+            width: auto;
+        }
+        .search-bar {
+            display: flex;
+            flex: 1;
+            max-width: 600px;
+            margin: 0 20px;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+        }
+        .search-bar button {
+            padding: 8px 16px;
+            background-color: #f8f8f8;
+            border: 1px solid #ccc;
+            border-left: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-menu button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        .user-menu button:hover {
+            background-color: #f0f0f0;
+        }
+        .user-menu img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .filter-chips {
+            display: flex;
+            gap: 12px;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            overflow-x: auto;
+        }
+        .chip {
+            background-color: #f2f2f2;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+        .chip:hover {
+            background-color: #e0e0e0;
+        }
+        .chip.active {
+            background-color: #000;
+            color: #fff;
+        }
+        .video-channel {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .channel-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #ccc;
+        }
+        .container {
+            display: flex;
+        }
+        aside {
+            width: 240px;
+            background-color: #fff;
+            padding: 20px 0;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+        aside.hidden {
+            transform: translateX(-100%);
+        }
+        aside ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        aside li {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        aside li:hover {
+            background-color: #f0f0f0;
+        }
+        aside li i {
+            margin-right: 10px;
+        }
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .video-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            background-color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        .video-info {
+            padding: 12px;
+        }
+        .video-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .video-channel {
+            color: #666;
+            font-size: 14px;
+        }
+        .video-stats {
+            color: #666;
+            font-size: 12px;
+        }
+        .video-player {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .video-player iframe {
+            width: 80%;
+            height: 80%;
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .video-grid.shorts {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .video-card.short {
+            max-width: 200px;
+        }
+        .video-card.short .video-thumbnail {
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="hamburger">☰</div>
+        <div class="logo">
+            <img src="https://www.gstatic.com/youtube/img/branding/youtubelogo/svg/youtubelogo.svg" alt="YouTube Logo">
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search">
+            <button>🔍</button>
+        </div>
+        <div class="user-menu">
+            <button>📹</button>
+            <button>🔔</button>
+            <img src="https://assets-prd.ignimgs.com/2021/12/14/minecraft-1639513933156.jpg?crop=1%3A1%2Csmart&format=jpg&auto=webp&quality=80" alt="User">
+        </div>
+    </header>
+    <div class="container">
+        <aside>
+            <ul>
+                <li><i>🏠</i> Home</li>
+                <li><i>▶️</i> Shorts</li>
+                <li><i>🔥</i> Trending</li>
+                <li><i>📺</i> Subscriptions</li>
+                <li><i>📚</i> Library</li>
+                <li><i>🕒</i> History</li>
+                <li><i>🎵</i> Music</li>
+                <li><i>🎮</i> Gaming</li>
+                <li><i>📰</i> News</li>
+                <li><i>🏆</i> Sports</li>
+                <li><i>🔍</i> Explore</li>
+            </ul>
+        </aside>
+        <main>
+            <div class="filter-chips">
+                <button class="chip active">All</button>
+                <button class="chip">Music</button>
+                <button class="chip">Gaming</button>
+                <button class="chip">News</button>
+                <button class="chip">Sports</button>
+                <button class="chip">Comedy</button>
+                <button class="chip">Education</button>
+                <button class="chip">Technology</button>
+                <button class="chip">Entertainment</button>
+                <button class="chip">Travel</button>
+            </div>
+            <div class="video-grid">
+                <div class="video-card" onclick="window.location.href='https://www.youtube.com/watch?v=mK3pqGiLtfM'">
+                    <div class="video-thumbnail"><img src="https://img.youtube.com/vi/mK3pqGiLtfM/maxresdefault.jpg" alt="Thumbnail" style="width:100%; height:100%; object-fit:cover;"><div class="video-duration">3:45</div></div>
+                    <div class="video-info">
+                        <div class="video-title">"Bhojpuri Thumka Playlist"</div>
+                        <div class="video-channel">
+                            <div class="channel-avatar"></div>
+                            Just Khwab🌙
+                        </div>
+                        <div class="video-stats">1M views • 1 day ago</div>
+                    </div>
+                </div>
+                <div class="video-card" onclick="window.location.href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'">
+                    <div class="video-thumbnail"><img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" alt="Thumbnail" style="width:100%; height:100%; object-fit:cover;"></div>
+                    <div class="video-info">
+                        <div class="video-title">RICK ASTLEY</div>
+                        <div class="video-channel">Rick Astley</div>
+                        <div class="video-stats">500K views • 2 days ago</div>
+                    </div>
+                </div>
+                <div class="video-card" data-category="music" onclick="window.location.href='https://www.youtube.com/watch?v=kJQP7kiw5Fk'">
+                    <div class="video-thumbnail"><img src="https://img.youtube.com/vi/kJQP7kiw5Fk/maxresdefault.jpg" alt="Thumbnail" style="width:100%; height:100%; object-fit:cover;"></div>
+                    <div class="video-info">
+                        <div class="video-title">Despacito - Luis Fonsi</div>
+                        <div class="video-channel">Luis Fonsi <span style="color: #065fd4; font-weight: bold;">✓</span></div>
+                        <div class="video-stats">7B views • 5 years ago</div>
+                    </div>
+                </div>
+                <div class="video-card" data-category="music" onclick="window.location.href='https://www.youtube.com/watch?v=hTWKbfoikeg'">
+                    <div class="video-thumbnail"><img src="https://img.youtube.com/vi/hTWKbfoikeg/maxresdefault.jpg" alt="Thumbnail" style="width:100%; height:100%; object-fit:cover;"></div>
+                    <div class="video-info">
+                        <div class="video-title">Shape of You - Ed Sheeran</div>
+                        <div class="video-channel">Ed Sheeran <span style="color: #065fd4; font-weight: bold;">✓</span></div>
+                        <div class="video-stats">5B views • 6 years ago</div>
+                    </div>
+                </div>
+                <div class="video-card" data-category="music" onclick="window.location.href='https://www.youtube.com/watch?v=OPf0YbXqDm0'">
+                    <div class="video-thumbnail"><img src="https://img.youtube.com/vi/OPf0YbXqDm0/maxresdefault.jpg" alt="Thumbnail" style="width:100%; height:100%; object-fit:cover;"></div>
+                    <div class="video-info">
+                        <div class="video-title">Uptown Funk - Mark Ronson ft. Bruno Mars</div>
+                        <div class="video-channel">Mark Ronson</div>
+                        <div class="video-stats">4B views • 8 years ago</div>
+                    </div>
+                </div>
+                <div class="video-card" data-type="short" onclick="window.location.href='https://www.youtube.com/shorts/dQw4w9WgXcQ'">
+                    <div class="video-thumbnail"><img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" alt="Thumbnail" style="width:100%; height:100%; object-fit:cover;"></div>
+                    <div class="video-info">
+                        <div class="video-title">Never Gonna Give You Up - Short</div>
+                        <div class="video-channel">Rick Astley</div>
+                        <div class="video-stats">1M views • 1 hour ago</div>
+                    </div>
+                </div>
+                <div class="video-card" data-type="short" onclick="window.location.href='https://www.youtube.com/shorts/kJQP7kiw5Fk'">
+                    <div class="video-thumbnail"><img src="https://img.youtube.com/vi/kJQP7kiw5Fk/maxresdefault.jpg" alt="Thumbnail" style="width:100%; height:100%; object-fit:cover;"></div>
+                    <div class="video-info">
+                        <div class="video-title">Despacito Dance - Short</div>
+                        <div class="video-channel">Luis Fonsi</div>
+                        <div class="video-stats">500K views • 2 hours ago</div>
+                    </div>
+                </div>
+                <!-- Add more video cards as needed -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const hamburger = document.querySelector('.hamburger');
+        const sidebar = document.querySelector('aside');
+        const videoGrid = document.querySelector('.video-grid');
+        const videoCards = document.querySelectorAll('.video-card');
+
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+        });
+
+        // Sidebar navigation
+        const sidebarItems = document.querySelectorAll('aside li');
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const text = item.textContent.trim();
+                if (text === 'Home') {
+                    showAllVideos();
+                } else if (text === 'Shorts') {
+                    showShorts();
+                } else if (text === 'Music') {
+                    showMusic();
+                } else {
+                    // Placeholder for other categories
+                    alert(`${text} section coming soon!`);
+                }
+            });
+        });
+
+        function showAllVideos() {
+            videoGrid.classList.remove('shorts');
+            videoCards.forEach(card => {
+                card.classList.remove('short');
+                card.style.display = 'block';
+            });
+        }
+
+        function showShorts() {
+            videoGrid.classList.add('shorts');
+            videoCards.forEach(card => {
+                if (card.dataset.type === 'short') {
+                    card.classList.add('short');
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function showMusic() {
+            videoGrid.classList.remove('shorts');
+            videoCards.forEach(card => {
+                card.classList.remove('short');
+                if (card.dataset.category === 'music') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-bar input');
+        const searchButton = document.querySelector('.search-bar button');
+
+        function filterVideos() {
+            const query = searchInput.value.trim().toLowerCase();
+            videoCards.forEach(card => {
+                const title = card.querySelector('.video-title').textContent.toLowerCase();
+                if (title.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        searchButton.addEventListener('click', filterVideos);
+        searchInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                filterVideos();
+            }
+        });
+    </script>
+</body>
+</html>
